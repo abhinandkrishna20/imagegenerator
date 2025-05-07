@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Resizable Text to Image App</title>
+  <title>Advanced Text to Image App</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,36 +16,46 @@
       height: 200px;
       border: 2px dashed #666;
       margin-top: 20px;
-      padding: 0;
+      position: relative;
+      background-size: cover;
+      background-position: center;
     }
 
     #output {
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       padding: 20px;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      color: black;
       font-size: 20px;
+      cursor: move;
       text-align: center;
-      transition: all 0.3s ease;
+      white-space: pre-wrap;
     }
 
-    select, input[type="color"], input[type="text"] {
+    select, input[type="color"], input[type="text"], input[type="range"], input[type="file"] {
       margin: 5px;
+    }
+
+    label {
+      margin-right: 10px;
     }
   </style>
 </head>
 <body>
-  <h2>Resizable Text to Image App</h2>
+
+  <h2>Advanced Text to Image Generator</h2>
 
   <input type="text" id="userInput" placeholder="Type something..." />
 
   <br><br>
 
+  <label>Font Size:</label>
+  <input type="range" id="fontSize" min="10" max="100" value="20" />
+
   <label>Background Color:</label>
-  <input type="color" id="bgColor" value="#f2f2f2" />
+  <input type="color" id="bgColor" value="#ffffff" />
 
   <label>Text Color:</label>
   <input type="color" id="textColor" value="#000000" />
@@ -59,11 +69,15 @@
     <option value="'Comic Sans MS', cursive">Comic Sans</option>
   </select>
 
+  <label>Upload Background Image:</label>
+  <input type="file" id="bgImageUpload" accept="image/*" />
+
   <br><br>
+
   <button onclick="generateImage()">Generate Image</button>
 
   <div id="output-container">
-    <div id="output"></div>
+    <div id="output" draggable="true">Your Text</div>
   </div>
 
   <a id="downloadLink" style="display:none;" download="text-image.png">Download Image</a>
@@ -71,13 +85,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     const outputDiv = document.getElementById('output');
+    const outputContainer = document.getElementById('output-container');
     const bgColor = document.getElementById('bgColor');
     const textColor = document.getElementById('textColor');
     const fontSelect = document.getElementById('fontSelect');
-    const outputContainer = document.getElementById('output-container');
+    const fontSizeSlider = document.getElementById('fontSize');
+    const bgImageUpload = document.getElementById('bgImageUpload');
 
+    // Live Updates
     bgColor.addEventListener('input', () => {
-      outputDiv.style.backgroundColor = bgColor.value;
+      outputContainer.style.backgroundColor = bgColor.value;
     });
 
     textColor.addEventListener('input', () => {
@@ -88,13 +105,42 @@
       outputDiv.style.fontFamily = fontSelect.value;
     });
 
+    fontSizeSlider.addEventListener('input', () => {
+      outputDiv.style.fontSize = fontSizeSlider.value + 'px';
+    });
+
+    bgImageUpload.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          outputContainer.style.backgroundImage = `url(${e.target.result})`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Drag to move text inside the box
+    let offsetX, offsetY;
+    outputDiv.addEventListener('dragstart', (e) => {
+      const rect = outputDiv.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+    });
+
+    outputContainer.addEventListener('dragover', (e) => e.preventDefault());
+
+    outputContainer.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const x = e.clientX - outputContainer.getBoundingClientRect().left - offsetX;
+      const y = e.clientY - outputContainer.getBoundingClientRect().top - offsetY;
+      outputDiv.style.left = `${x}px`;
+      outputDiv.style.top = `${y}px`;
+    });
+
     function generateImage() {
       const text = document.getElementById('userInput').value;
       outputDiv.textContent = text;
-
-      outputDiv.style.backgroundColor = bgColor.value;
-      outputDiv.style.color = textColor.value;
-      outputDiv.style.fontFamily = fontSelect.value;
 
       html2canvas(outputContainer).then(canvas => {
         const link = document.getElementById('downloadLink');
