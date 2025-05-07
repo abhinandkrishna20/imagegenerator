@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Text to Image with Color Picker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #output {
+      width: 400px;
+      height: 200px;
+      padding: 20px;
+      border: 2px solid #333;
+      font-size: 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <h2>Enter Text to Convert to Image</h2>
+  <input type="text" id="userInput" placeholder="Type something..." />
+  <br><br>
+  <label for="colorPicker">Choose Background Color: </label>
+  <input type="color" id="colorPicker" value="#f2f2f2" />
+  <br><br>
+  <button onclick="generateImage()">Generate Image</button>
+
+  <div id="output"></div>
+  <a id="downloadLink" style="display:none;" download="text-image.png">Download Image</a>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    const outputDiv = document.getElementById('output');
+    const colorPicker = document.getElementById('colorPicker');
+
+    colorPicker.addEventListener('input', function () {
+      outputDiv.style.backgroundColor = colorPicker.value;
+    });
+
+    function generateImage() {
+      const text = document.getElementById('userInput').value;
+      outputDiv.textContent = text;
+
+      html2canvas(outputDiv).then(canvas => {
+        const link = document.getElementById('downloadLink');
+        link.href = canvas.toDataURL();
+        link.style.display = 'inline';
+        link.textContent = 'Download Image';
+      });
+    }
+  </script>
+</body>
+</html>
