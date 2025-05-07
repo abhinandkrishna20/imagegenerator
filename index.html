@@ -2,32 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Text to Image Customizer</title>
+  <title>Resizable Text to Image App</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
     }
-    #output {
+
+    #output-container {
+      resize: both;
+      overflow: auto;
       width: 400px;
       height: 200px;
+      border: 2px dashed #666;
+      margin-top: 20px;
+      padding: 0;
+    }
+
+    #output {
+      width: 100%;
+      height: 100%;
       padding: 20px;
-      border: 2px solid #333;
-      font-size: 20px;
-      text-align: center;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 20px;
+      font-size: 20px;
+      text-align: center;
       transition: all 0.3s ease;
     }
+
     select, input[type="color"], input[type="text"] {
       margin: 5px;
     }
   </style>
 </head>
 <body>
-  <h2>Customize Your Text Image</h2>
+  <h2>Resizable Text to Image App</h2>
 
   <input type="text" id="userInput" placeholder="Type something..." />
 
@@ -51,7 +62,10 @@
   <br><br>
   <button onclick="generateImage()">Generate Image</button>
 
-  <div id="output"></div>
+  <div id="output-container">
+    <div id="output"></div>
+  </div>
+
   <a id="downloadLink" style="display:none;" download="text-image.png">Download Image</a>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -60,8 +74,8 @@
     const bgColor = document.getElementById('bgColor');
     const textColor = document.getElementById('textColor');
     const fontSelect = document.getElementById('fontSelect');
+    const outputContainer = document.getElementById('output-container');
 
-    // Live update styles
     bgColor.addEventListener('input', () => {
       outputDiv.style.backgroundColor = bgColor.value;
     });
@@ -78,12 +92,11 @@
       const text = document.getElementById('userInput').value;
       outputDiv.textContent = text;
 
-      // Apply current styles
       outputDiv.style.backgroundColor = bgColor.value;
       outputDiv.style.color = textColor.value;
       outputDiv.style.fontFamily = fontSelect.value;
 
-      html2canvas(outputDiv).then(canvas => {
+      html2canvas(outputContainer).then(canvas => {
         const link = document.getElementById('downloadLink');
         link.href = canvas.toDataURL();
         link.style.display = 'inline';
