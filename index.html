@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Text to Image with Color Picker</title>
+  <title>Text to Image Customizer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,16 +19,35 @@
       align-items: center;
       justify-content: center;
       margin-top: 20px;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
+    }
+    select, input[type="color"], input[type="text"] {
+      margin: 5px;
     }
   </style>
 </head>
 <body>
-  <h2>Enter Text to Convert to Image</h2>
+  <h2>Customize Your Text Image</h2>
+
   <input type="text" id="userInput" placeholder="Type something..." />
+
   <br><br>
-  <label for="colorPicker">Choose Background Color: </label>
-  <input type="color" id="colorPicker" value="#f2f2f2" />
+
+  <label>Background Color:</label>
+  <input type="color" id="bgColor" value="#f2f2f2" />
+
+  <label>Text Color:</label>
+  <input type="color" id="textColor" value="#000000" />
+
+  <label>Font Style:</label>
+  <select id="fontSelect">
+    <option value="Arial">Arial</option>
+    <option value="'Courier New', Courier, monospace">Courier New</option>
+    <option value="'Times New Roman', Times, serif">Times New Roman</option>
+    <option value="'Georgia', serif">Georgia</option>
+    <option value="'Comic Sans MS', cursive">Comic Sans</option>
+  </select>
+
   <br><br>
   <button onclick="generateImage()">Generate Image</button>
 
@@ -38,15 +57,31 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     const outputDiv = document.getElementById('output');
-    const colorPicker = document.getElementById('colorPicker');
+    const bgColor = document.getElementById('bgColor');
+    const textColor = document.getElementById('textColor');
+    const fontSelect = document.getElementById('fontSelect');
 
-    colorPicker.addEventListener('input', function () {
-      outputDiv.style.backgroundColor = colorPicker.value;
+    // Live update styles
+    bgColor.addEventListener('input', () => {
+      outputDiv.style.backgroundColor = bgColor.value;
+    });
+
+    textColor.addEventListener('input', () => {
+      outputDiv.style.color = textColor.value;
+    });
+
+    fontSelect.addEventListener('change', () => {
+      outputDiv.style.fontFamily = fontSelect.value;
     });
 
     function generateImage() {
       const text = document.getElementById('userInput').value;
       outputDiv.textContent = text;
+
+      // Apply current styles
+      outputDiv.style.backgroundColor = bgColor.value;
+      outputDiv.style.color = textColor.value;
+      outputDiv.style.fontFamily = fontSelect.value;
 
       html2canvas(outputDiv).then(canvas => {
         const link = document.getElementById('downloadLink');
